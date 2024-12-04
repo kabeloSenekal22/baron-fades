@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book an Appointment</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .content-block {
+            background-image: url('pictures/image4.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+        }
+        .content-block h2, .content-block form {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Baron Fades Barbershop</h1>
+        <img src="pictures/logo.jpg" alt="Baron Fades Barbershop Logo">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="book-appointment.html" class="active">Book an Appointment</a></li>
+                <li><a href="profile.html" id="profile-link" class="hidden">Profile</a></li>
+                <li><a href="#" id="logout-link" class="hidden">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="main-content">
+        <section class="content-block" id="login-section">
+            <h2>Login</h2>
+            <form id="login-form">
+                <label for="login-email">Email:</label>
+                <input type="email" id="login-email" required>
+
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" required>
+
+                <input type="submit" value="Login">
+                <p>Don't have an account? <a href="register.html">Register here</a></p>
+            </form>
+        </section>
+
+        <section class="content-block" id="appointment-section" style="display:none;">
+            <h2>Book an Appointment</h2>
+            <form id="appointment-form">
+                <label for="appointment-name">Name:</label>
+                <input type="text" id="appointment-name" name="name" required>
+
+                <label for="appointment-email">Email:</label>
+                <input type="email" id="appointment-email" name="email" required>
+
+                <label for="appointment-phone">Phone:</label>
+                <input type="text" id="appointment-phone" name="phone" required>
+
+                <label for="appointment-service">Service:</label>
+                <select id="appointment-service" name="service" required>
+                    <option value="Haircut">Haircut</option>
+                    <option value="Shave">Shave</option>
+                    <option value="Haircut and Shave">Haircut and Shave</option>
+                    <option value="Beard Trim">Beard Trim</option>
+                    <option value="House Call">House Call</option>
+                    <!-- Add more services here -->
+                </select>
+
+                <label for="appointment-date">Date:</label>
+                <input type="date" id="appointment-date" name="date" required>
+
+                <label for="appointment-time">Time:</label>
+                <input type="time" id="appointment-time" name="time" required>
+
+                <input type="submit" value="Book Appointment">
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2024 Baron Fades Barbershop. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function checkLogin() {
+            let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (loggedInUser) {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('appointment-section').style.display = 'block';
+                document.getElementById('profile-link').classList.remove('hidden');
+                document.getElementById('logout-link').classList.remove('hidden');
+            } else {
+                document.getElementById('login-section').style.display = 'block';
+                document.getElementById('appointment-section').style.display = 'none';
+            }
+        }
+
+        function initializePage() {
+            checkLogin();
+
+            document.getElementById('login-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                let email = document.getElementById('login-email').value;
+                let password = document.getElementById('login-password').value;
+
+                let users = JSON.parse(localStorage.getItem('users')) || [];
+                let user = users.find(u => u.email === email && u.password === password);
+
+                if (user) {
+                    localStorage.setItem('loggedInUser', JSON.stringify(user));
+                    checkLogin(); // Refresh the display
+                } else {
+                    alert('Invalid email or password.');
+                }
+            });
+
+            document.getElementById('appointment-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                let name = document.getElementById('appointment-name').value;
+                let email = document.getElementById('appointment-email').value;
+                let phone = document.getElementById('appointment-phone').value;
+                let service = document.getElementById('appointment-service').value;
+                let date = document.getElementById('appointment-date').value;
+                let time = document.getElementById('appointment-time').value;
+
+                let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+
+                bookings.push({
+                    name,
+                    email,
+                    phone,
+                    service,
+                    date,
+                    time
+                });
+
+                localStorage.setItem('bookings', JSON.stringify(bookings));
+
+                alert('Your appointment has been booked!');
+                document.getElementById('appointment-form').reset();
+            });
+        }
+
+        window.addEventListener('load', initializePage);
+
+        document.getElementById('logout-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html'; // Redirect to main page
+        });
+    </script>
+</body>
+</html>

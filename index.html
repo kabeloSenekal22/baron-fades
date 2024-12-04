@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Baron Fades Barbershop</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Baron Fades Barbershop</h1>
+        <img src="pictures/logo.jpg" alt="Baron Fades Barbershop Logo">
+        <nav>
+            <ul>
+                <li><a href="index.html" class="active">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="book-appointment.html">Book an Appointment</a></li>
+                <li><a href="#" id="logout-link" class="hidden">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero">
+            <h2>Welcome to Baron Fades Barbershop!</h2>
+            <p>Experience top-notch grooming in a relaxed atmosphere.</p>
+        </section>
+
+        <section id="about-us" class="content-block">
+            <h2>About Us</h2>
+            <p>We offer a range of services including haircuts, shaves, and more. Come in and experience the best in barbering!</p>
+        </section>
+
+        <section class="video-background">
+            <video id="background-video-services" src="videos/Video 3.mp4" autoplay loop muted></video>
+            <div class="video-content">
+                <h2>Our Services</h2>
+                <ul>
+                    <li>Haircut</li>
+                    <li>Shave</li>
+                    <li>Haircut and Shave</li>
+                    <li>Beard Trim</li>
+                    <li>House Call</li>
+                    <!-- Add more services here -->
+                </ul>
+                <p>Book an appointment for any service with us today!</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2024 Baron Fades Barbershop. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (loggedInUser) {
+                document.getElementById('profile-link').classList.remove('hidden');
+                document.getElementById('logout-link').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('logout-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html'; // Redirect to main page
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

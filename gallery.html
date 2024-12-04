@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Baron Fades Barbershop</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+		<h1>Baron Fades Barbershop</h1>
+        <img src="pictures/logo.jpg" alt="Baron Fades Barbershop Logo">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+				 <li><a href="about.html">About Us</a></li>
+                <li><a href="gallery.html" class="active">Gallery</a></li>
+                <li><a href="book-appointment.html">Book an Appointment</a></li>
+                <li><a href="#" id="logout-link" class="hidden">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="content-block">
+            <h2>Gallery</h2>
+            <!-- Add your gallery images here -->
+            <div class="slideshow-container">
+                <div class="mySlides">
+                    <img src="pictures/image1.jpg" class="slideshow-img" alt="Gallery Image 1">
+                </div>
+                <div class="mySlides">
+                    <img src="pictures/image2.jpg" class="slideshow-img" alt="Gallery Image 2">
+                </div>
+                <div class="mySlides">
+                    <img src="pictures/image3.jpg" class="slideshow-img" alt="Gallery Image 3">
+                </div>
+				<div class="mySlides">
+                    <img src="pictures/image4.jpg" class="slideshow-img" alt="Gallery Image 4">
+                </div>
+                <div class="mySlides">
+                    <img src="pictures/image5.jpg" class="slideshow-img" alt="Gallery Image 5">
+                </div>
+                <div class="mySlides">
+                    <img src="pictures/image6.jpg" class="slideshow-img" alt="Gallery Image 6">
+                </div>
+				<div class="mySlides">
+                    <img src="pictures/image7.jpg" class="slideshow-img" alt="Gallery Image 7">
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="footer-content">
+            <p>© 2024 Baron Fades Barbershop. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+        // Slideshow functionality
+        let slideIndex = 0;
+        showSlides();
+
+        function showSlides() {
+            let slides = document.getElementsByClassName("mySlides");
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";  
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) {slideIndex = 1}    
+            slides[slideIndex-1].style.display = "block";  
+            setTimeout(showSlides, 2000); // Change image every 2 seconds
+        }
+
+        // Check if user is logged in
+        document.addEventListener('DOMContentLoaded', function() {
+            let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (loggedInUser) {
+                document.getElementById('login-link').style.display = 'none';
+                document.getElementById('register-link').style.display = 'none';
+                document.getElementById('logout-link').style.display = 'inline';
+            }
+        });
+
+        // Handle logout
+        document.getElementById('logout-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('loggedInUser');
+            window.location.reload(); // Reload page to reflect the logout
+        });
+    </script>
+</body>
+</html>
+
+
+
+

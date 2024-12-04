@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .booking-day {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .booking-day h3 {
+            margin-top: 0;
+        }
+        .booking-day table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .booking-day table, .booking-day th, .booking-day td {
+            border: 1px solid #ddd;
+        }
+        .booking-day th, .booking-day td {
+            padding: 8px;
+            text-align: left;
+        }
+        .booking-day tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        #admin-summary {
+            margin-bottom: 20px;
+        }
+        #admin-summary p {
+            margin: 5px 0;
+        }
+        #booking-statistics {
+            margin-top: 20px;
+        }
+        #booking-statistics h3 {
+            margin-bottom: 10px;
+        }
+        #booking-statistics p {
+            margin: 5px 0;
+        }
+        #users-table th, #users-table td {
+            text-align: left;
+        }
+        #users h2 {
+            text-align: left;
+        }
+        #bookings {
+            background-image: url('pictures/image4.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+        }
+        #bookings h2, #bookings div {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .center-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Admin Panel</h1>
+    </header>
+    <main>
+        <nav>
+            <ul>
+                <li><a href="#dashboard">Dashboard</a></li>
+                <li><a href="#bookings">Bookings</a></li>
+                <li><a href="#users">Users</a></li>
+                <li><a href="#" id="logout-link">Logout</a></li>
+            </ul>
+        </nav>
+
+        <section id="dashboard" class="content-block-grey center-container">
+            <h2>Dashboard</h2>
+            <div id="admin-summary">
+                <p id="admin-daily-bookings">Today's Bookings: 0</p>
+                <p id="admin-total-bookings">Total Bookings: 0</p>
+            </div>
+            <div id="booking-statistics">
+                <h3>Booking Statistics</h3>
+                <p id="stat-total-users">Total Users: 0</p>
+                <p id="stat-upcoming-bookings">Upcoming Bookings: 0</p>
+                <p id="stat-past-bookings">Past Bookings: 0</p>
+            </div>
+        </section>
+
+        <section id="bookings" class="content-block">
+            <h2>Bookings</h2>
+            <div id="bookings-container"></div>
+        </section>
+
+        <section id="users" class="content-block">
+            <h2>Users</h2>
+            <table id="users-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </section>
+    </main>
+    <script>
+        // Handle logout
+        document.getElementById('logout-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html'; // Redirect to main page
+        });
+
+        function updateBookingStatistics() {
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+
+            // Calculate today's bookings
+            let todaysBookings = bookings.filter(booking => booking.date === today);
+
+            // Calculate upcoming and past bookings
+            let now = new Date();
+            let upcomingBookings = bookings.filter(booking => new Date(booking.date + 'T' + booking.time) >= now);
+            let pastBookings = bookings.filter(booking => new Date(booking.date + 'T' + booking.time) < now);
+
+            // Update summary
+            document.getElementById('admin-daily-bookings').innerText = `Today's Bookings: ${todaysBookings.length}`;
+            document.getElementById('admin-total-bookings').innerText = `Total Bookings: ${bookings.length}`;
+
+            // Update statistics
+            document.getElementById('stat-total-users').innerText = `Total Users: ${users.length}`;
+            document.getElementById('stat-upcoming-bookings').innerText = `Upcoming Bookings: ${upcomingBookings.length}`;
+            document.getElementById('stat-past-bookings').innerText = `Past Bookings: ${pastBookings.length}`;
+        }
+
+        function loadBookings() {
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            let bookingsContainer = document.getElementById('bookings-container');
+
+            // Filter out past bookings
+            let now = new Date();
+            bookings = bookings.filter(booking => new Date(booking.date + 'T' + booking.time) >= now);
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+
+            if (bookings.length === 0) {
+                bookingsContainer.innerHTML = '<p>No bookings available</p>';
+                return;
+            }
+
+            // Group bookings by date
+            let groupedBookings = bookings.reduce((acc, booking) => {
+                if (!acc[booking.date]) {
+                    acc[booking.date] = [];
+                }
+                acc[booking.date].push(booking);
+                return acc;
+            }, {});
+
+            // Generate HTML for each day
+            for (let date in groupedBookings) {
+                let dayBookings = groupedBookings[date];
+                let dayDiv = document.createElement('div');
+                dayDiv.className = 'booking-day';
+
+                let dateHeading = document.createElement('h3');
+                dateHeading.innerText = `Bookings for ${date}`;
+                dayDiv.appendChild(dateHeading);
+
+                let table = document.createElement('table');
+                let thead = document.createElement('thead');
+                let tbody = document.createElement('tbody');
+
+                thead.innerHTML = `
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Service</th>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Action</th>
+                    </tr>
+                `;
+                table.appendChild(thead);
+
+                dayBookings.forEach(booking => {
+                    let row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${booking.name}</td>
+                        <td>${booking.email}</td>
+                        <td>${booking.phone}</td>
+                        <td>${booking.service}</td>
+                        <td>${booking.date}</td>
+                        <td>${booking.time}</td>
+                        <td><button onclick="deleteBooking('${booking.date}', '${booking.time}')">Delete</button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(tbody);
+                dayDiv.appendChild(table);
+                bookingsContainer.appendChild(dayDiv);
+            }
+        }
+
+        function deleteBooking(date, time) {
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            bookings = bookings.filter(booking => !(booking.date === date && booking.time === time));
+            localStorage.setItem('bookings', JSON.stringify(bookings));
+            loadBookings();
+            updateBookingStatistics();
+        }
+
+        function loadUsers() {
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            let usersTableBody = document.getElementById('users-table').getElementsByTagName('tbody')[0];
+
+            if (users.length === 0) {
+                usersTableBody.innerHTML = '<tr><td colspan="2">No users available</td></tr>';
+                return;
+            }
+
+            users.forEach(user => {
+                let row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                `;
+                usersTableBody.appendChild(row);
+            });
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            updateBookingStatistics();
+            loadBookings();
+            loadUsers();
+        });
+    </script>
+</body>
+</html>
+
+
+
+

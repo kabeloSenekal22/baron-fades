@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Baron Fades Barbershop</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Baron Fades Barbershop</h1>
+        <img src="pictures/logo.jpg" alt="Baron Fades Barbershop Logo">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="book-appointment.html">Book an Appointment</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="content-block">
+            <h2>Register</h2>
+            <form id="register-form">
+                <label for="register-name">Name</label>
+                <input type="text" id="register-name" required>
+
+                <label for="register-email">Email</label>
+                <input type="email" id="register-email" required>
+
+                <label for="register-password">Password</label>
+                <input type="password" id="register-password" required>
+
+                <input type="submit" value="Register">
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2024 Baron Fades Barbershop. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.getElementById('register-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+            let existingUser = users.find(u => u.email === email);
+
+            if (existingUser) {
+                alert('User already exists.');
+            } else {
+                users.push({ name, email, password });
+                localStorage.setItem('users', JSON.stringify(users));
+                alert('Registration successful!');
+                localStorage.setItem('loggedInUser', JSON.stringify({ name, email, password }));
+                window.location.href = 'profile.html'; // Redirect to profile page after successful registration
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+

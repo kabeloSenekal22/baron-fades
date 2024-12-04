@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Baron Fades Barbershop</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Baron Fades Barbershop</h1>
+        <img src="pictures/logo.jpg" alt="Baron Fades Barbershop Logo">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="book-appointment.html">Book an Appointment</a></li>
+                <li><a href="#" id="logout-link">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="content-block" style="background-image: url('pictures/image4.jpg'); background-size: cover;">
+            <div class="overlay">
+                <h2>Profile</h2>
+                <div id="profile-info">
+                    <h3>Personal Information</h3>
+                    <img id="profile-picture" src="" alt="Profile Picture" style="width: 150px; height: 150px; border-radius: 50%;">
+                    <input type="file" id="upload-picture" accept="image/*">
+                    <p id="profile-name"></p>
+                    <p id="profile-email"></p>
+                    <p id="profile-phone"></p>
+                    <p id="profile-address"></p>
+                    <button id="edit-profile-btn">Edit Profile</button>
+                </div>
+                <div id="edit-profile-form" style="display: none;">
+                    <h3>Edit Profile</h3>
+                    <form id="profile-form">
+                        <label for="name">Name:</label>
+                        <input type="text" id="name" name="name" required>
+                        <label for="email">Email:</label>
+                        <input type="email" id="email" name="email" required>
+                        <label for="phone">Phone:</label>
+                        <input type="text" id="phone" name="phone">
+                        <label for="address">Address:</label>
+                        <input type="text" id="address" name="address">
+                        <button type="submit">Save</button>
+                    </form>
+                </div>
+                <div id="appointments">
+                    <h3>Your Bookings</h3>
+                    <table id="appointments-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Service</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="appointments-container"></tbody>
+                    </table>
+                    <button id="view-past-bookings-btn">View Past Bookings</button>
+                    <div id="past-bookings" style="display: none;">
+                        <h3>Past Bookings</h3>
+                        <table id="past-bookings-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Time</th>
+                                    <th>Service</th>
+                                </tr>
+                            </thead>
+                            <tbody id="past-bookings-container"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2024 Baron Fades Barbershop. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        function displayProfile() {
+            let user = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (user) {
+                document.getElementById('profile-name').textContent = `Name: ${user.name}`;
+                document.getElementById('profile-email').textContent = `Email: ${user.email}`;
+                document.getElementById('profile-phone').textContent = `Phone: ${user.phone || 'N/A'}`;
+                document.getElementById('profile-address').textContent = `Address: ${user.address || 'N/A'}`;
+                if (user.profilePicture) {
+                    document.getElementById('profile-picture').src = user.profilePicture;
+                }
+            } else {
+                alert('You need to be logged in to view this page.');
+                window.location.href = 'login.html'; // Redirect to login page if not logged in
+            }
+        }
+
+        function displayAppointments() {
+            let user = JSON.parse(localStorage.getItem('loggedInUser'));
+            let appointmentsContainer = document.getElementById('appointments-container');
+            let pastBookingsContainer = document.getElementById('past-bookings-container');
+            appointmentsContainer.innerHTML = ''; // Clear previous content
+            pastBookingsContainer.innerHTML = ''; // Clear previous content
+
+            let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+            let userBookings = bookings.filter(booking => booking.email === user.email);
+
+            let now = new Date();
+
+            let upcomingBookings = userBookings.filter(booking => new Date(`${booking.date} ${booking.time}`) >= now);
+            let pastBookings = userBookings.filter(booking => new Date(`${booking.date} ${booking.time}`) < now);
+
+            if (upcomingBookings.length === 0) {
+                appointmentsContainer.innerHTML = '<tr><td colspan="4">You have no upcoming bookings.</td></tr>';
+            } else {
+                upcomingBookings.forEach(booking => {
+                    let row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${booking.date}</td>
+                        <td>${booking.time}</td>
+                        <td>${booking.service}</td>
+                        <td><button class="delete-booking-btn" data-date="${booking.date}" data-time="${booking.time}">Cancel</button></td>
+                    `;
+                    appointmentsContainer.appendChild(row);
+                });
+            }
+
+            if (pastBookings.length > 0) {
+                pastBookings.forEach(booking => {
+                    let row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${booking.date}</td>
+                        <td>${booking.time}</td>
+                        <td>${booking.service}</td>
+                    `;
+                    pastBookingsContainer.appendChild(row);
+                });
+            }
+        }
+
+        document.getElementById('appointments-container').addEventListener('click', function(e) {
+            if (e.target.classList.contains('delete-booking-btn')) {
+                let date = e.target.getAttribute('data-date');
+                let time = e.target.getAttribute('data-time');
+                let user = JSON.parse(localStorage.getItem('loggedInUser'));
+
+                let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+                bookings = bookings.filter(booking => !(booking.email === user.email && booking.date === date && booking.time === time));
+                localStorage.setItem('bookings', JSON.stringify(bookings));
+
+                displayAppointments(); // Refresh the appointments display
+            }
+        });
+
+        document.getElementById('edit-profile-btn').addEventListener('click', function() {
+            document.getElementById('edit-profile-form').style.display = 'block';
+            let user = JSON.parse(localStorage.getItem('loggedInUser'));
+            document.getElementById('name').value = user.name;
+            document.getElementById('email').value = user.email;
+            document.getElementById('phone').value = user.phone || '';
+            document.getElementById('address').value = user.address || '';
+        });
+
+        document.getElementById('profile-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let user = JSON.parse(localStorage.getItem('loggedInUser')) || {};
+            user.name = document.getElementById('name').value;
+            user.email = document.getElementById('email').value;
+            user.phone = document.getElementById('phone').value;
+            user.address = document.getElementById('address').value;
+            user.profilePicture = document.getElementById('profile-picture').src;
+            localStorage.setItem('loggedInUser', JSON.stringify(user));
+            displayProfile();
+            document.getElementById('edit-profile-form').style.display = 'none';
+        });
+
+        document.getElementById('upload-picture').addEventListener('change', function(e) {
+            let reader = new FileReader();
+            reader.onload = function() {
+                document.getElementById('profile-picture').src = reader.result;
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        });
+
+        document.getElementById('view-past-bookings-btn').addEventListener('click', function() {
+            let pastBookingsSection = document.getElementById('past-bookings');
+            pastBookingsSection.style.display = pastBookingsSection.style.display === 'none' ? 'block' : 'none';
+        });
+
+        // Handle logout
+        document.getElementById('logout-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html'; // Redirect to main page
+        });
+
+        // Initialize page
+        window.addEventListener('load', function() {
+            displayProfile();
+            displayAppointments();
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+

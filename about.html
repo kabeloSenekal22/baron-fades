@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .content-block {
+            background-image: url('pictures/image6.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+        }
+        .content-block h2, .content-block p {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Baron Fades Barbershop</h1>
+        <img src="pictures/logo.jpg" alt="Baron Fades Barbershop Logo">
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html" class="active">About Us</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="book-appointment.html">Book an Appointment</a></li>
+                <li><a href="#" id="logout-link" class="hidden">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="content-block">
+            <h2>About Us</h2>
+            <p>Welcome to Baron Fades Barbershop! We pride ourselves on delivering top-notch grooming services in a relaxed and welcoming atmosphere. Our skilled barbers are dedicated to providing you with the best experience possible.</p>
+            <p>At Baron Fades, we offer a range of services including haircuts, shaves, and more. Whether you're looking for a classic cut or a modern style, we’ve got you covered. Our goal is to make every visit a great one, so come in and experience the best in barbering!</p>
+            <p><a href="gallery.html">Check out our gallery</a> to see some of our work!</p>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <p>© 2024 Baron Fades Barbershop. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+            if (loggedInUser) {
+                document.getElementById('profile-link').classList.remove('hidden');
+                document.getElementById('logout-link').classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('logout-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'index.html'; // Redirect to main page
+        });
+    </script>
+</body>
+</html>
+
+
